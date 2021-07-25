@@ -1,5 +1,5 @@
 # MakeMkvKey
-A small shell script to automatically get the newest MakeMkv Beta Key on Linux
+A small shell script to automatically get the newest MakeMkv Beta Key on Linux.
 
 # Installation
 Put the script somewhere in your path and make it executable.

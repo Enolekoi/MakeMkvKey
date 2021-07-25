@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# Script to get the current beta key of MakeMKV
+
+# get the line containing the current key
+line="$(curl -s "https://forum.makemkv.com/forum/viewtopic.php?f=5&t=1053" | grep "The")"
+
+# save the current key in "current"
+current="$(echo $line | awk '{sub(/.*<code>/,"");sub(/<.*/,"");print }')"
+
+# save the old key in "old"
+old="$(awk '/app_Key/ {gsub(/"/,"");print $3}' $HOME/.MakeMKV/settings.conf)"
+
+# compare "old" and "current"
+if [ "$old" = "$current" ]; then
+    echo 'The current key is up to date.'
+else
+    #print out old and new key, ask if you want to replace it
+    echo 'old key: ' $old
+    echo 'new key: ' $current
+
+    read -r -p "Do you want to replace the old key? [Y/n] " input
+
+    case $input in
+        [yY][eE][sS]|[yY])
+
+        # replace the old key in setting.conf with the current one
+        awk -v key="$current" '/#/,/app_Java/ ;/app_Key/ {sub(/".*/,"\042" key "\042");print $0}; /app_Proxy/,/speed/' $HOME/.MakeMKV/settings.conf > $HOME/.MakeMKV/temp.conf
+        mv  $HOME/.MakeMKV/temp.conf $HOME/.MakeMKV/settings.conf
+    echo "Key replaced successfully!"
+
+        # save the experation date in "date" and print it out
+        date="$(echo $line | awk '{gsub(/[[:punct:]]/,"");print $20,$21}')"
+        echo 'The new key expires on the end of' $date
+    ;;
+        [nN][oO]|[nN])
+    echo "Key wasn't replaced"
+    ;;
+        *)
+    echo "Invalid input..."
+    exit 1
+    ;;
+    esac
+fi

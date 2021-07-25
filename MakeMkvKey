@@ -20,7 +20,6 @@ else
     echo 'new key: ' $current
 
     read -r -p "Do you want to replace the old key? [Y/n] " input
-
     case $input in
         [yY][eE][sS]|[yY])
 
